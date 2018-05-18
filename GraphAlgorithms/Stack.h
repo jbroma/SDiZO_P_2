@@ -1,16 +1,16 @@
 #pragma once
 #include "List.h"
 
-class Queue {
+class Stack {
 
 private:
 	List * list;
 
 public:
-	Queue();
-	~Queue();
-	void enqueue(const int num);
-	int dequeue();
+	Stack();
+	~Stack();
+	void push(const int num);
+	int pop();
 	bool isEmpty();
 };
 

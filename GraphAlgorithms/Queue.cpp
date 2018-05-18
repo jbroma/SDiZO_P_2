@@ -6,7 +6,7 @@ Queue::Queue() {
 }
 
 Queue::~Queue() {
-	delete list;
+	delete this->list;
 }
 
 void Queue::enqueue(const int num) {
@@ -14,5 +14,9 @@ void Queue::enqueue(const int num) {
 }
 
 int Queue::dequeue() {
-	this->list->popBack();
+	return this->list->popBack();
+}
+
+bool Queue::isEmpty() {
+	return this->list->getSize() == 0 ? true : false;
 }
