@@ -20,20 +20,20 @@ private:
 
 public:
 	
-	void push_front(const int el);
-	void push_back(const int el);
-	void insert(const int el, const int pos);
-	void remove_front();
-	void remove_back();
-	void remove(const int pos);
-	bool find(const int el);
-	void set_num(const int new_num, const int pos);
-	std::string to_string();
-	int get_size();
-	List::List_Node* get_head();
-	List::List_Node* get_tail();
 	List();
 	List(int * arr);
 	~List();
+	void pushFront(const int el);
+	void pushBack(const int el);
+	void insert(const int el, const int pos);
+	int popFront();
+	int popBack();
+	int remove(const int pos);
+	bool find(const int el);
+	void setValue(const int new_num, const int pos);
+	std::string to_string();
+	int getSize();
+	List::List_Node* getHead();
+	List::List_Node* getTail();
 };
 
