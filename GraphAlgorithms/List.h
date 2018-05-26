@@ -14,14 +14,14 @@ private:
 public:
 	List();
 	~List();
-	void pushFront(Type * new_data);
-	void pushBack(Type * new_data);
-	void insert(Type * new_data, int pos);
-	Type * popFront();
-	Type * popBack();
-	Type * remove(int pos);
-	bool find(Type * data);
-	void setValue(Type * new_data, int pos);
+	void pushFront(const Type* new_data);
+	void pushBack(const Type* new_data);
+	void insert(const Type* new_data, const int pos);
+	const Type* popFront();
+	const Type* popBack();
+	const Type* remove(const int pos);
+	bool find(const Type* data);
+	void setValue(const Type* new_data, const int pos);
 	int getSize();
 	List<Type>::List_Node * getHead();
 	List<Type>::List_Node * getTail();
@@ -35,9 +35,10 @@ template <typename Type>
 class List<Type>::List_Node {
 	
 public:
+	
 	List_Node * prev = nullptr;
 	List_Node * next = nullptr;
-	Type * value;
+	const Type* data;
 };
 
 // ----------------------------
@@ -50,8 +51,10 @@ List<Type>::List() {
 
 template <typename Type>
 List<Type>::~List() {
+	const Type * tmp;
 	while (this->size) {
-		this->popFront();
+		tmp = this->popFront();
+		delete tmp;
 	}
 }
 
@@ -71,9 +74,9 @@ typename List<Type>::List_Node * List<Type>::getTail() {
 }
 
 template <typename Type>
-void List<Type>::pushFront(Type * new_data) {
+void List<Type>::pushFront(const Type *new_data) {
 	List_Node * new_node = new List_Node();
-	new_node->value = new_data;
+	new_node->data = new_data;
 	if (this->head)
 		this->head->prev = new_node;
 	else
@@ -84,9 +87,9 @@ void List<Type>::pushFront(Type * new_data) {
 }
 
 template <typename Type>
-void List<Type>::pushBack(Type * new_data) {
+void List<Type>::pushBack(const Type *new_data) {
 	List_Node * new_node = new List_Node();
-	new_node->value = new_data;
+	new_node->data = new_data;
 	if (this->tail)
 		this->tail->next = new_node;
 	else
@@ -97,19 +100,19 @@ void List<Type>::pushBack(Type * new_data) {
 }
 
 template <typename Type>
-void List<Type>::insert(Type * new_data, int pos) {
+void List<Type>::insert(const Type* new_data, const int pos) {
 	if (pos == 0) {
-		this->pushFront(value);
+		this->pushFront(data);
 		return;
 	}
 	if (pos == this->size) {
-		this->pushBack(value);
+		this->pushBack(data);
 		return;
 	}
 	if (pos > this->size || pos < 0)
 		throw std::invalid_argument("Specified position is invalid.\n");
 	List_Node * new_node = new List_Node();
-	new_node->value = new_data;
+	new_node->data = new_data;
 	List_Node * it;
 	int current_pos;
 
@@ -138,7 +141,7 @@ void List<Type>::insert(Type * new_data, int pos) {
 }
 
 template <typename Type>
-Type * List<Type>::popFront() {
+const Type* List<Type>::popFront() {
 	if (!this->head)
 		throw  std::invalid_argument("The list is empty\n");
 	List_Node * element = this->head;
@@ -147,14 +150,14 @@ Type * List<Type>::popFront() {
 	else
 		this->tail = nullptr;
 	this->head = element->next;
-	Type * value = element->value;
+	const Type *data = element->data;
 	delete element;
 	this->size--;
-	return value;
+	return data;
 }
 
 template <typename Type>
-Type * List<Type>::popBack() {
+const Type* List<Type>::popBack() {
 	if (this->size == 0)
 		throw  std::invalid_argument("The list is empty\n");
 	List_Node * element = this->tail;
@@ -163,14 +166,14 @@ Type * List<Type>::popBack() {
 	else
 		this->head = nullptr;
 	this->tail = element->prev;
-	Type * value = element->value;
+	const Type *data = element->data;
 	delete element;
 	this->size--;
-	return value;
+	return data;
 }
 
 template <typename Type>
-Type * List<Type>::remove(int pos) {
+const Type* List<Type>::remove(const int pos) {
 	if (pos == 0) {
 		this->popFront();
 		return;
@@ -201,17 +204,17 @@ Type * List<Type>::remove(int pos) {
 	}
 	it->next->prev = it->prev;
 	it->prev->next = it->next;
-	Type * value = it->value;
+	const Type *data = it->data;
 	delete it;
 	this->size--;
-	return value;
+	return data;
 }
 
 template <typename Type>
-bool List<Type>::find(Type * el) {
+bool List<Type>::find(const Type* data) {
 	List_Node * it = this->head;
 	while (it) {
-		if (it->value == el)
+		if (it->data == data)
 			return true;
 		it = it->next;
 	}
@@ -219,12 +222,12 @@ bool List<Type>::find(Type * el) {
 }
 
 template <typename Type>
-void List<Type>::setValue(Type * new_data, int pos) {
+void List<Type>::setValue(const Type* new_data, const int pos) {
 	if (pos < 0 || pos >= this->size)
 		throw std::invalid_argument("Specified position is invalid");
 	List_Node * it = this->head;
 	for (int i = 0; i < pos; i++)
 		it = it->next;
-	it->value = new_data;
+	it->data = new_data;
 }
 
