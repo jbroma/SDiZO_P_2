@@ -10,8 +10,8 @@ private:
 public:
 	Queue() { this->list = new List<Type>(); };
 	~Queue() { delete this->list; };
-	void enqueue(Type* data) { this->list->pushFront(data); };
-	const Type* dequeue() { return this->list->popBack(); };
+	void enqueue(Type data) { this->list->pushFront(data); };
+	Type dequeue() { return this->list->popBack(); };
 	bool isEmpty() { return this->list->getSize() == 0 ? true : false; };
 };
 

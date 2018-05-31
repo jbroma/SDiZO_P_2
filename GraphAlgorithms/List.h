@@ -7,6 +7,7 @@ class List {
 
 private:
 	class List_Node;
+	class List_Iterator;
 	List_Node * head = nullptr;
 	List_Node * tail = nullptr;
 	int size = 0;
@@ -14,17 +15,18 @@ private:
 public:
 	List();
 	~List();
-	void pushFront(const Type* new_data);
-	void pushBack(const Type* new_data);
-	void insert(const Type* new_data, const int pos);
-	const Type* popFront();
-	const Type* popBack();
-	const Type* remove(const int pos);
-	bool find(const Type* data);
-	void setValue(const Type* new_data, const int pos);
+	void pushFront(Type new_data);
+	void pushBack(Type new_data);
+	void insert(Type new_data, int pos);
+	Type popFront();
+	Type popBack();
+	Type remove(int pos);
 	int getSize();
-	List<Type>::List_Node * getHead();
-	List<Type>::List_Node * getTail();
+
+	List_Iterator begin();
+	List_Iterator end();
+	List_Iterator rbegin();
+	List_Iterator rend();
 };
 
 // ---------------------------
@@ -35,10 +37,57 @@ template <typename Type>
 class List<Type>::List_Node {
 	
 public:
-	
 	List_Node * prev = nullptr;
 	List_Node * next = nullptr;
-	const Type* data;
+	Type data;
+};
+
+// -------------------------------
+// Nested List_Iterator definition
+// -------------------------------
+
+template <typename Type>
+class List<Type>::List_Iterator {
+
+private:
+	List_Node *pos;
+
+public:
+	List_Iterator(List_Node *p = nullptr) : pos(p) {}
+
+	Type& operator*() { 
+		return pos->data; 
+	}
+
+	Type* operator->() { 
+		return &(pos->data);
+	}
+
+	bool operator!=(const List_Iterator &other) { 
+		return this->pos != other.pos;
+	}
+
+	List_Iterator& operator++() {
+		pos = pos->next;
+		return *this;
+	}
+
+	List_Iterator operator++(int unused) { 
+		List_Iterator tmp(*this);
+		++(*this);
+		return tmp;
+	}
+
+	List_Iterator& operator--() {
+		pos = pos->prev;
+		return *this;
+	}
+
+	List_Iterator operator--(int) {
+		List_Iterator tmp(*this);
+		++(*this);
+		return tmp;
+	}
 };
 
 // ----------------------------
@@ -51,11 +100,8 @@ List<Type>::List() {
 
 template <typename Type>
 List<Type>::~List() {
-	const Type * tmp;
-	while (this->size) {
-		tmp = this->popFront();
-		delete tmp;
-	}
+	while (this->size)
+		popFront();
 }
 
 template <typename Type>
@@ -64,17 +110,7 @@ int List<Type>::getSize() {
 }
 
 template <typename Type>
-typename List<Type>::List_Node * List<Type>::getHead() {
-	return this->head;
-}
-
-template <typename Type>
-typename List<Type>::List_Node * List<Type>::getTail() {
-	return this->tail;
-}
-
-template <typename Type>
-void List<Type>::pushFront(const Type *new_data) {
+void List<Type>::pushFront(Type new_data) {
 	List_Node * new_node = new List_Node();
 	new_node->data = new_data;
 	if (this->head)
@@ -87,7 +123,7 @@ void List<Type>::pushFront(const Type *new_data) {
 }
 
 template <typename Type>
-void List<Type>::pushBack(const Type *new_data) {
+void List<Type>::pushBack(Type new_data) {
 	List_Node * new_node = new List_Node();
 	new_node->data = new_data;
 	if (this->tail)
@@ -100,15 +136,7 @@ void List<Type>::pushBack(const Type *new_data) {
 }
 
 template <typename Type>
-void List<Type>::insert(const Type* new_data, const int pos) {
-	if (pos == 0) {
-		this->pushFront(data);
-		return;
-	}
-	if (pos == this->size) {
-		this->pushBack(data);
-		return;
-	}
+void List<Type>::insert(Type new_data, int pos) {
 	if (pos > this->size || pos < 0)
 		throw std::invalid_argument("Specified position is invalid.\n");
 	List_Node * new_node = new List_Node();
@@ -116,7 +144,7 @@ void List<Type>::insert(const Type* new_data, const int pos) {
 	List_Node * it;
 	int current_pos;
 
-	if ((this->size - pos) >(this->size / 2)) {
+	if ((this->size - pos) >=(this->size / 2)) {
 		current_pos = 0;
 		it = this->head;
 		while (current_pos != pos) {
@@ -141,7 +169,7 @@ void List<Type>::insert(const Type* new_data, const int pos) {
 }
 
 template <typename Type>
-const Type* List<Type>::popFront() {
+Type List<Type>::popFront() {
 	if (!this->head)
 		throw  std::invalid_argument("The list is empty\n");
 	List_Node * element = this->head;
@@ -150,14 +178,14 @@ const Type* List<Type>::popFront() {
 	else
 		this->tail = nullptr;
 	this->head = element->next;
-	const Type *data = element->data;
+	Type data = element->data;
 	delete element;
 	this->size--;
 	return data;
 }
 
 template <typename Type>
-const Type* List<Type>::popBack() {
+Type List<Type>::popBack() {
 	if (this->size == 0)
 		throw  std::invalid_argument("The list is empty\n");
 	List_Node * element = this->tail;
@@ -166,14 +194,14 @@ const Type* List<Type>::popBack() {
 	else
 		this->head = nullptr;
 	this->tail = element->prev;
-	const Type *data = element->data;
+	Type data = element->data;
 	delete element;
 	this->size--;
 	return data;
 }
 
 template <typename Type>
-const Type* List<Type>::remove(const int pos) {
+Type List<Type>::remove(const int pos) {
 	if (pos == 0) {
 		this->popFront();
 		return;
@@ -204,30 +232,30 @@ const Type* List<Type>::remove(const int pos) {
 	}
 	it->next->prev = it->prev;
 	it->prev->next = it->next;
-	const Type *data = it->data;
+	Type data = it->data;
 	delete it;
 	this->size--;
 	return data;
 }
 
 template <typename Type>
-bool List<Type>::find(const Type* data) {
-	List_Node * it = this->head;
-	while (it) {
-		if (it->data == data)
-			return true;
-		it = it->next;
-	}
-	return false;
+typename List<Type>::List_Iterator List<Type>::begin() {
+	return List_Iterator(this->head);
 }
 
 template <typename Type>
-void List<Type>::setValue(const Type* new_data, const int pos) {
-	if (pos < 0 || pos >= this->size)
-		throw std::invalid_argument("Specified position is invalid");
-	List_Node * it = this->head;
-	for (int i = 0; i < pos; i++)
-		it = it->next;
-	it->data = new_data;
+typename List<Type>::List_Iterator List<Type>::end() {
+	return List_Iterator();
 }
+
+template <typename Type>
+typename List<Type>::List_Iterator List<Type>::rbegin() {
+	return List_Iterator(this->tail);
+}
+
+template <typename Type>
+typename List<Type>::List_Iterator List<Type>::rend() {
+	return List_Iterator();
+}
+
 

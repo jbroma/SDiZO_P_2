@@ -10,7 +10,7 @@ private:
 public:
 	Stack() { this->list = new List<Type>(); };
 	~Stack() { delete this->list; };
-	void push(const Type * data) { this->list->pushBack(num); };
+	void push(Type * data) { this->list->pushBack(num); };
 	Type* pop() { return this->list->popBack(); };
 	bool isEmpty() { return this->list->getSize() == 0 ? true : false; };
 };
