@@ -49,6 +49,10 @@ bool AdjacencyMatrix::isEdge(int start, int end) {
 	// contstraint: vertices must have a non-negative ID
 	if (start >= vertices || start < 0 || end >= vertices || end < 0)
 		throw std::invalid_argument("Invalid vertex parameters");
+	return matrix[start][end] != NO_EDGE ? true : false;
+}
+
+int AdjacencyMatrix::getWeight(int start, int end) {
 	return matrix[start][end];
 }
 
@@ -57,16 +61,19 @@ void AdjacencyMatrix::setUndirected() {
 }
 
 void AdjacencyMatrix::convertToUndirected() {
+	if (undirected)
+		return;
 	for (int i = 0; i < vertices; i++) {
 		for (int j = 0; j < vertices; j++) {
 			matrix[j][i] = matrix[i][j];
 		}
 	}
+	this->undirected = true;
 }
 
 std::string AdjacencyMatrix::toString() {
 	std::stringstream ss;
-	ss << "Adjacency Matrix of a Graph:\n";
+	ss << "Adjacency Matrix contents:\n";
 	ss << "\t";
 	for (int i = 0; i < vertices; i++) {
 		ss << i << " ";
@@ -75,7 +82,10 @@ std::string AdjacencyMatrix::toString() {
 	for (int i = 0; i < vertices; i++) {
 		ss << i << "\t";
 		for (int j = 0; j < vertices; j++) {
-			ss << matrix[i][j] << " ";
+			if (matrix[i][j] == NO_EDGE)
+				ss << "N ";
+			else 
+				ss << matrix[i][j] << " ";
 		}
 		ss << "\n";
 	}

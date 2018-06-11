@@ -21,8 +21,6 @@ void hideCursor()
 
 int menu(int coordX, int coordY, std::string title, int n, ...)
 {
-	std::cin.clear();
-	std::cin.sync();
 	hideCursor();
 	std::string whitespaces = "                                        ";
 	for (int i = 0; i < title.length(); i++) {
@@ -102,6 +100,8 @@ int menu(int coordX, int coordY, std::string title, int n, ...)
 				delete[] wsk;
 				gotoXY(1, 1);
 				Sleep(200);
+				std::cin.clear();
+				std::cin.sync();
 				std::cin.ignore(1000, '\n');
 				return pozycja;
 			}
@@ -115,7 +115,6 @@ int menu(int coordX, int coordY, std::string title, int n, ...)
 std::string inputPrompt(std::string title)
 {
 	Sleep(100);
-	std::cin.sync();
 	std::string input;
 	std::string whitespaces = "                                        ";
 	for (int i = 0; i < title.length(); i++) {
@@ -127,7 +126,9 @@ std::string inputPrompt(std::string title)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 	gotoXY(MENU_X, MENU_Y + 1);
 	std::cin >> input;
-	system("cls");
 	std::cin.clear();
+	std::cin.sync();
+	//std::cin.ignore(INT_MAX, '\n');
+	system("cls");
 	return input;
 }

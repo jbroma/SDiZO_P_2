@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <List>
 
 class AdjacencyMatrix {
 private:
@@ -18,6 +19,8 @@ public:
 	void removeEdge(int start, int end);
 	// Checks whether an edge exists between vertices A(start) and B(end). This function is unaffected by undirected flag.
 	bool isEdge(int start, int end);
+	// Retrieves weight of a specified edge
+	int getWeight(int start, int end);
 	// Sets the undirected flag to TRUE, making all further operations act like the graph is an undirected graph.
 	void setUndirected();
 	// Converts a graph to an Undirected Graph, making all existing edges undirected.
