@@ -168,7 +168,7 @@ void Graph::spDijkstraList() {
 	while (!queue->isEmpty()) {
 		u = queue->popMin();
 		auto& adjacent = adj_list->getAdjacent(u);
-		for (Edge e : adjacent) {
+		for (Edge& e : adjacent) {
 			v = e.getEndVertex();
 			weight = e.getEdgeWeight();
 			if (dist[v] > dist[u] + weight) {
@@ -226,7 +226,7 @@ void Graph::spBellmanFordMatrix() {
 	dist[source_vertex] = 0;
 	prev[source_vertex] = 0;
 	int u, v, weight;
-	// Relax all edges
+	// Relax all edges 
 	for (int i = 1; i <= vertices - 1; ++i) {
 		for (int j = 0; j < edges; ++j) {
 			u = edges_arr[j]->getStartVertex();
@@ -290,7 +290,7 @@ void Graph::spBellmanFordList() {
 	for (int i = 1; i <= vertices - 1; ++i) {
 		for (int j = 0; j < vertices; ++j) {
 			auto& adjacent = adj_list->getAdjacent(j);
-			for (Edge e : adjacent) {
+			for (Edge& e : adjacent) {
 				u = e.getStartVertex();
 				v = e.getEndVertex();
 				weight = e.getEdgeWeight();
@@ -305,7 +305,7 @@ void Graph::spBellmanFordList() {
 	bool negative_edges = false;
 	for (int i = 0; i < vertices; ++i) {
 		auto& adjacent = adj_list->getAdjacent(i);
-		for (Edge e : adjacent) {
+		for (Edge& e : adjacent) {
 			u = e.getStartVertex();
 			v = e.getEndVertex();
 			weight = e.getEdgeWeight();
@@ -454,7 +454,7 @@ void Graph::mstKruskalMatrix() {
 	
 	// Put all edges into the queue and sort them
 	for (int i = 0; i < vertices; ++i) {
-		for (int j = i; j < vertices; ++j) {
+		for (int j = 0; j < vertices; ++j) {
 			if (i != j && adj_matrix->isEdge(i, j)) {
 				weight = adj_matrix->getWeight(i, j);
 				queue->insert(new Edge(i, j, weight), weight);
@@ -573,4 +573,68 @@ int Graph::find_kruskal(int& vertex, DisjointSet** sets) {
 	if (sets[vertex]->parent != vertex)
 		sets[vertex]->parent = find_kruskal(sets[vertex]->parent,sets);
 	return sets[vertex]->parent;
+}
+
+void Graph::generateGraph(int& vertices, float& density) {
+	
+	// This function generates a random graph that is ready for testing 
+	// Initialisation
+	this->vertices = vertices;
+	adj_matrix = new AdjacencyMatrix(vertices);
+	adj_list = new AdjacencyList(vertices);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	//distribution for shuffle
+	dist vertex_dist(0, INT_MAX);
+	//distribution for edge weights
+	dist edge_dist(1, 1000);				
+	//Step 1 - Generate at least 1 valid path
+	//Start with random sequence of vertices
+	auto queue = new Queue<int>;
+	auto arr = new int[vertices];
+	for (int i = 0; i < vertices; ++i)
+		arr[i] = i;
+	int tmp, rand1, rand2;
+	// shuffle
+	for (int i = 0; i < vertices * 10; ++i) {
+		rand1 = vertex_dist(gen) % vertices;
+		rand2 = vertex_dist(gen) % vertices;
+		tmp = arr[rand1];
+		arr[rand1] = arr[rand2];
+		arr[rand2] = tmp;
+	}
+	// Enqueue the sequence
+	for (int i = 0; i < vertices; ++i) {
+		queue->enqueue(arr[i]);
+	}
+	delete[] arr;
+	// Create the path
+	int start, end, weight;
+	start = queue->dequeue();
+	source_vertex = start;
+	while (!queue->isEmpty()) {
+		end = queue->dequeue();
+		weight = edge_dist(gen);
+		adj_matrix->addEdge(start, end, weight);
+		adj_list->addEdge(start, end, weight);
+		start = end;
+	}
+	this->destination_vertex = start;
+	delete queue;
+	int edges = vertices - 1;
+	int max_edges = vertices * (vertices - 1);
+	int desired_edges = density * max_edges;
+	// Step 2 - Fill the graph with random edges until desired density is met
+	while (edges != desired_edges) {
+		start = vertex_dist(gen) % vertices;
+		end = vertex_dist(gen) % vertices;
+		if (start != end && !adj_matrix->isEdge(start, end)) {
+			weight = edge_dist(gen);
+			adj_matrix->addEdge(start, end, weight);
+			adj_list->addEdge(start, end, weight);
+			++edges;
+		}
+	}
+	this->edges = edges;
+	this->status = true;
 }

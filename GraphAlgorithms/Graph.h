@@ -3,17 +3,22 @@
 #include "AdjacencyMatrix.h"
 #include "Edge.h"
 #include "PriorityQueue.h"
+#include "Queue.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <random>
 
 class Graph {
 
 private:
+	typedef std::uniform_int_distribution<> dist;
+
 	AdjacencyMatrix * adj_matrix;
 	AdjacencyList * adj_list;
 	struct DisjointSet;
+	
 	// These fields are initialized when loading a graph or generating a random one
 	int edges;
 	int vertices;
@@ -51,6 +56,7 @@ public:
 	bool getUndirected();
 	void loadGraphFromFile(std::string file_path);
 	void saveGraphToFile(std::string file_path);
+	void generateGraph(int& vertices, float& density);
 	
 	// Shortest Path Algorithms
 	void spDijkstraMatrix();
@@ -74,7 +80,6 @@ public:
 struct Graph::DisjointSet {
 	int parent;
 	int rank;
-	DisjointSet(int parent) : parent(parent), rank(0) {
-	};
+	DisjointSet(int parent) : parent(parent), rank(0) {};
 };
 
